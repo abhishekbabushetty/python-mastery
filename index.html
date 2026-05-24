@@ -7564,6 +7564,312 @@ PYBIND11_MODULE(fastmath, m) {
 <li>Never return pointer to stack from C++ to Python.</li>
 <li>GIL: release with <code>py::gil_scoped_release</code> for long CPU work.</li>
 </ul>
+
+<!-- ========== ADDED: Master completion plan + bridge combination questions (existing content above unchanged) ========== -->
+
+<div id="bridge-master-plan" class="cpp-methodology">
+<h2 id="bridge-plan">Master Plan — Complete Python + C++ + Bridge (Phase 0)</h2>
+<p><strong>Goal:</strong> Finish both tracks with <em>artifacts in Git</em>, not “HTML read.” Bridge tab is your <strong>integration layer</strong> after fundamentals lock in. Realistic Phase 0: <strong>4–6 months</strong> at ~6h/day (adjust if needed).</p>
+<h3>Daily structure (Phase 0)</h3>
+<table>
+<tr><th>Block</th><th>Time</th><th>What</th></tr>
+<tr><td>Python track</td><td>2h</td><td>One topic block: Deep Understanding → 3–5 questions typed in <code>practice/</code></td></tr>
+<tr><td>C++ track</td><td>2h</td><td>Parallel topic: compile + ASan → 3–5 questions in <code>practice_cpp/</code></td></tr>
+<tr><td>Build / DSA</td><td>2h</td><td>Mini DB Engine milestones OR daily DSA (arrays → trees)</td></tr>
+<tr><td>Revision</td><td>1h</td><td>Draw memory / trace errors / Git commit meaningful diff</td></tr>
+</table>
+<div class="tip"><strong>Perfection bar:</strong> A topic is “done” when ≥40/60 questions attempted, ≥1 capstone shipped with tests, and you can explain the Deep Understanding panel without notes.</div>
+</div>
+
+<div id="bridge-sequence" class="deep-dive">
+<h2 id="bridge-sequence-map">Topic Sequence Map — Python ∥ C++ (week-by-week)</h2>
+<p>Run <strong>both tracks in parallel</strong> where concepts mirror each other. C++ lags Python by ~1 week on memory-heavy topics (you need Python intuition first, then C++ mechanism).</p>
+<table>
+<tr><th>Week</th><th>Python MASTER</th><th>C++ MASTER</th><th>Combined focus</th><th>Milestone</th></tr>
+<tr><td>1–2</td><td>01 Fundamentals, 02 Control flow, 03 Strings</td><td>01 Compilation, 02 Types/const, 03 Operators</td><td>Types, flow, strings vs <code>std::string</code></td><td>Hello world both; Git repo init</td></tr>
+<tr><td>3–4</td><td>04 Collections, 05 Functions, 06 Comprehensions</td><td>04 Pointers, 05 RAII, 06 Arrays/strings</td><td>list/dict vs vector/map; references</td><td>CLI arg parser Python; C++ vector lab</td></tr>
+<tr><td>5–6</td><td>07 Memory, 08 Recursion, 09 OOP</td><td>07 Classes, 08 Rule of Five, 09 Inheritance</td><td>objects, ownership, polymorphism</td><td>Start <strong>Mini DB Engine</strong> (Python)</td></tr>
+<tr><td>7–8</td><td>10 Decorators, 11 Generators, 12 Context</td><td>10 STL containers, 11 STL algorithms</td><td>iteration, RAII, hash index for DB</td><td>DB: hash map index + generator row scan</td></tr>
+<tr><td>9–10</td><td>13 Modules, 14 Typing, 15 Async</td><td>12 Move, 13 Smart pointers, 14 Templates</td><td>packages, types, generic code</td><td>DB: typed API + BST ordered queries</td></tr>
+<tr><td>11–12</td><td>16 Concurrency, 17 Capstones polish</td><td>15 Concurrency, 16 Exceptions/I/O, 17 CMake</td><td>threads, I/O, build hygiene</td><td><strong>C++ dynamic array</strong> capstone; compare to Python list</td></tr>
+<tr><td>13–14</td><td>Python capstones review</td><td>18 Networking, 19 Bridge (C++ side)</td><td>sockets preview; read bridge concepts</td><td>Mini DB Engine <strong>v1 shipped</strong></td></tr>
+<tr><td>15–16</td><td colspan="2" style="text-align:center"><strong>Bridge tab (this section) — Q1–Q20 below</strong></td><td>pybind11, GIL, ownership</td><td>First extension: <code>fastmath</code> + benchmark</td></tr>
+<tr><td>17–20</td><td colspan="2" style="text-align:center"><strong>Bridge Q21–Q30 + Combination capstones</strong></td><td>NumPy, thread pool, packaging</td><td>Wrap Mini DB hot path OR matrix kernel</td></tr>
+</table>
+</div>
+
+<div id="bridge-crosswalk" class="study-guide">
+<h2 id="bridge-crosswalk-table">Concept Crosswalk — Same Idea, Two Languages</h2>
+<table>
+<tr><th>Concept</th><th>Python (topic)</th><th>C++ (topic)</th><th>Bridge insight</th></tr>
+<tr><td>Memory / ownership</td><td>07 Memory model</td><td>05 RAII, 13 Smart pointers</td><td>Python GC hides heap; C++ makes ownership explicit — bridge must document who frees</td></tr>
+<tr><td>Sequences</td><td>04 Collections, 11 Generators</td><td>06 Arrays/strings, 10 STL containers</td><td>NumPy buffer ≈ <code>vector</code> + stride; generator ≈ lazy iterator</td></tr>
+<tr><td>Objects / types</td><td>09 OOP, 14 Typing</td><td>07 Classes, 14 Templates</td><td>pybind11 maps classes; templates = compile-time generics</td></tr>
+<tr><td>Errors</td><td>12 Context &amp; exceptions</td><td>16 Exceptions &amp; I/O</td><td>C++ exceptions become Python exceptions if translated</td></tr>
+<tr><td>Concurrency</td><td>16 Multithreading</td><td>15 Concurrency</td><td>GIL vs real threads — release GIL in C++ CPU work</td></tr>
+<tr><td>Modules / build</td><td>13 Modules &amp; packages</td><td>01 Toolchain, 17 CMake</td><td><code>pip install -e .</code> + CMake extension build</td></tr>
+<tr><td>I/O &amp; networking</td><td>15 Async (preview)</td><td>16 filesystem, 18 Networking</td><td>Python orchestrates; C++ can own socket hot path later</td></tr>
+</table>
+<h4>When are you “ready” for Bridge Q1?</h4>
+<ul>
+<li>Python ≥ topic 07 (memory) + 09 (OOP) + 13 (modules)</li>
+<li>C++ ≥ topic 05 (RAII) + 07 (classes) + 13 (smart pointers) + 17 (CMake)</li>
+<li>You have profiled one Python bottleneck and written down why it is slow</li>
+</ul>
+</div>
+
+<div id="bridge-completion" class="note">
+<h2 id="bridge-done">Definition of “Both Tracks Perfectly Complete”</h2>
+<ol>
+<li><strong>Python:</strong> All 17 topics — ≥45/60 questions each; Mini DB Engine in <code>practice/capstones/mini_db/</code> with pytest; decorators + generators used in production paths.</li>
+<li><strong>C++:</strong> Topics 01–17 required, 18–19 strongly recommended — ≥45/60 each; manual <code>DynamicArray</code> with Rule of Five; ASan-clean capstone; CMake project builds out-of-source.</li>
+<li><strong>Bridge:</strong> All 30 questions below + at least <strong>2 combination capstones</strong> (Python CLI + C++ core + pytest + benchmark doc).</li>
+<li><strong>Git:</strong> Meaningful commit history; README per capstone; no secrets in repo.</li>
+<li><strong>Feel test:</strong> Explain reference vs pointer, GIL, and why <code>vector::push_back</code> invalidates iterators — without opening notes.</li>
+</ol>
+</div>
+
+<h2 id="bridge-questions">Bridge Practice Questions (30) — Python + C++ Combined</h2>
+<p><span class="tag">BQ1–BQ10 Foundations</span> <span class="tag">BQ11–BQ20 Integration</span> <span class="tag">BQ21–BQ30 MEGA combination</span></p>
+<p>Every question requires <strong>both languages</strong>. Store work in <code>bridge/&lt;project&gt;/</code> with <code>python/</code>, <code>cpp/</code>, <code>tests/</code>, <code>CMakeLists.txt</code>, <code>pyproject.toml</code>.</p>
+
+<div class="q-block"><span class="q-num">BQ1</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">Side-by-side: Python list growth vs C++ vector — predict reallocation</div>
+<div class="q-lens"><strong>Mental model lens:</strong> Python hides capacity; C++ exposes it. Same algorithmic cost, different control.</div>
+<span class="q-label">Your goal:</span><p>Feel why Phase 0 C++ dynamic array capstone matters before any pybind11 work.</p>
+<span class="q-label">What you must do:</span>
+<p><strong>Python side:</strong> Append 1..1_000_000 to a list; use <code>sys.getsizeof</code> and id checks — document when new objects appear.<br>
+<strong>C++ side:</strong> <code>vector&lt;int&gt;</code> with <code>reserve</code> vs without; log <code>capacity()</code> after each growth.<br>
+<strong>Bridge write-up:</strong> One-page comparison table: allocation pattern, iterator/pointer invalidation, amortized O(1). No extension yet — pure understanding.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Both programs in <code>bridge/bq01_growth/</code></li><li>Plot or print table ≥10 size checkpoints</li><li>Written answer: “What breaks if C++ holds raw pointer across push_back?”</li><li>Link to Python topic 07 and C++ topics 06 + 10</li></ul>
+<div class="q-success"><strong>Done when:</strong> You predict next capacity in C++ before running; Python section explains reference vs new int object.</div></div>
+
+<div class="q-block"><span class="q-num">BQ2</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">Implement sum(array) in pure Python, pure C++, then pybind11 — benchmark crossover</div>
+<div class="q-lens"><strong>Mental model lens:</strong> Bridge only wins when Python overhead dominates; measure crossover size.</div>
+<span class="q-label">Your goal:</span><p>First real pybind11 module with honest benchmark methodology.</p>
+<span class="q-label">What you must do:</span>
+<p><strong>Phase A:</strong> Python <code>sum_list(nums)</code> with loop.<br>
+<strong>Phase B:</strong> C++ <code>sum(const vector&lt;double&gt;&amp;)</code> standalone binary.<br>
+<strong>Phase C:</strong> <code>PYBIND11_MODULE</code> exposing same function.<br>
+<strong>Phase D:</strong> Benchmark sizes 10², 10⁴, 10⁶, 10⁷; warmup + median of 10 runs; plot crossover.<br>
+Explain: boxing, bounds check elimination, GIL (held for simple call).</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li><code>pip install -e .</code> works</li><li>pytest asserts Python == C++ extension result</li><li>README with crossover chart</li><li>-Wall -Wextra clean</li></ul>
+<div class="q-success"><strong>Done when:</strong> You state numerically above which N extension wins; pure Python still correct for all N.</div></div>
+
+<div class="q-block"><span class="q-num">BQ3</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">Recursion: same DFS on tree — Python object graph vs C++ struct + unique_ptr</div>
+<div class="q-lens"><strong>Mental model lens:</strong> Python recursion depth vs C++ stack limits; ownership tree differs.</div>
+<span class="q-label">Your goal:</span><p>Connect Python topic 08 + C++ topics 07/09/13 before binding trees.</p>
+<span class="q-label">What you must do:</span>
+<p>Build binary tree DFS in Python (class Node with left/right). Rebuild in C++ with <code>struct Node { int val; unique_ptr&lt;Node&gt; left, right; }</code>. Same traversal order output. Document stack depth limit test (Python <code>sys.getrecursionlimit</code> vs C++ stack overflow). Optional: expose C++ tree factory to Python via pybind11 read-only traversal.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Identical preorder output on 3 test trees</li><li>Comment on memory: Python GC vs unique_ptr destruction order</li><li>≥8 pytest + 8 gtest cases</li></ul>
+<div class="q-success"><strong>Done when:</strong> Destructor order logged in C++ matches expected post-order cleanup.</div></div>
+
+<div class="q-block"><span class="q-num">BQ4</span> <span class="difficulty diff-brutal">BRUTAL</span>
+<div class="q-title">Mini DB hash index: Python dict API + optional C++ unordered_map core via extension</div>
+<div class="q-lens"><strong>Mental model lens:</strong> Same ADT, two implementations — Python for correctness first, C++ for hot lookup path.</div>
+<span class="q-label">Your goal:</span><p>First combination capstone tying Phase 0 Mini DB to both tracks.</p>
+<span class="q-label">What you must do:</span>
+<p><strong>Python:</strong> <code>Index</code> class wrapping dict for id→record offset (generators for scan — topic 11).<br>
+<strong>C++:</strong> <code>unordered_map&lt;uint64_t, size_t&gt;</code> with same interface in native test harness.<br>
+<strong>Bridge (optional v2):</strong> pybind11 module <code>fast_index</code> used by Python DB when <code>USE_NATIVE=1</code>. Profile lookup-heavy workload; document when switch worth it.<br>
+Write WAL stub comment linking to Phase 1 file storage.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Pure Python path must work standalone</li><li>C++ unit tests without Python</li><li>Integration tests both paths</li><li>≥500 line DB milestone documented in README</li></ul>
+<div class="q-success"><strong>Done when:</strong> Insert 10k records; lookup benchmark published; both paths pass same pytest suite.</div></div>
+
+<div class="q-block"><span class="q-num">BQ5</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">Decorator timing: Python @timer vs C++ RAII Timer class — same logs</div>
+<div class="q-lens"><strong>Mental model lens:</strong> Decorator ≈ wrapping; RAII ≈ ctor/dtor scope guard — parallel patterns.</div>
+<span class="q-label">What you must do:</span>
+<p>Python <code>@timing</code> decorator writing ms to stderr. C++ <code>Timer</code> in destructor prints same format. Wrap same algorithm (sort 100k ints) on both sides. If binding: C++ sort exposed to Python, decorator measures extension call.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Matching log format</li><li>Explain stack unwind vs decorator finally</li><li>Link topics Py 10, C++ 05+08</li></ul>
+<div class="q-success"><strong>Done when:</strong> Log lines indistinguishable format; written comparison ≤400 words.</div></div>
+
+<div class="q-block"><span class="q-num">BQ6</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">Exception bridge: C++ throw std::runtime_error → Python RuntimeError with message</div>
+<div class="q-lens"><strong>Mental model lens:</strong> Errors must translate at boundary; never let C++ exceptions escape unmapped.</div>
+<span class="q-label">What you must do:</span>
+<p>C++ function validates input, throws on bad data. pybind11 maps to Python. pytest checks <code>pytest.raises(RuntimeError, match=...)</code>. Add case where C++ catches Python exception via callback (advanced).</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>≥6 error path tests</li><li>ASan clean</li><li>Document exception guarantee on API</li></ul>
+<div class="q-success"><strong>Done when:</strong> Python tests never segfault on bad input; message preserved.</div></div>
+
+<div class="q-block"><span class="q-num">BQ7</span> <span class="difficulty diff-brutal">BRUTAL</span>
+<div class="q-title">NumPy zero-copy: py::array_t&lt;double&gt; in-place scale — lifetime diagram</div>
+<div class="q-lens"><strong>Mental model lens:</strong> NumPy owns buffer; C++ is guest — <code>keep_alive</code> rules.</div>
+<span class="q-label">What you must do:</span>
+<p>Python creates <code>np.zeros(1_000_000)</code>; C++ mutates in place with GIL released. Draw ownership diagram: Python array object, base pointer, C++ view lifetime. Test: mutate, then delete Python ref — extension must not retain dangling pointer. Negative test with ASan.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Shape mismatch raises Python ValueError</li><li>Benchmark vs NumPy multiply</li><li>Ownership diagram in README</li></ul>
+<div class="q-success"><strong>Done when:</strong> ASan clean; wrong shape caught; 2×+ speedup at 1e6 on CPU-bound run.</div></div>
+
+<div class="q-block"><span class="q-num">BQ8</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">ctypes vs pybind11: same extern "C" add — ergonomics report</div>
+<span class="q-label">What you must do:</span>
+<p>Export <code>extern "C" int add_c(int,int)</code> from shared lib. Bind via ctypes and pybind11. Compare: lines of code, type safety, class support, build steps, error messages. Recommend when each is appropriate.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Working both bindings</li><li>≥600 word report</li><li>Table: feature × ctypes × pybind11</li></ul>
+<div class="q-success"><strong>Done when:</strong> Team-style decision doc completed.</div></div>
+
+<div class="q-block"><span class="q-num">BQ9</span> <span class="difficulty diff-brutal">BRUTAL</span>
+<div class="q-title">GIL experiment: C++ sleep vs compute — Python threads parallel or not</div>
+<div class="q-lens"><strong>Mental model lens:</strong> GIL serializes Python bytecode; released C++ compute allows true parallelism.</div>
+<span class="q-label">What you must do:</span>
+<p>Extension with (A) busy C++ loop 4× on 4 Python threads without GIL release, (B) same with <code>py::gil_scoped_release</code>. Plot wall time. Relate to Python topic 16 and C++ topic 15.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>4-thread test harness</li><li>Written explanation of GIL interaction</li><li>TSan on C++ side</li></ul>
+<div class="q-success"><strong>Done when:</strong> (B) shows near-linear speedup on 4 cores; (A) does not.</div></div>
+
+<div class="q-block"><span class="q-num">BQ10</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">Package layout: scikit-build-core + CMake pybind11 — import from clean venv</div>
+<span class="q-label">What you must do:</span>
+<p>Production layout: <code>src/cpp/</code>, <code>src/python/pkg/</code>, <code>pyproject.toml</code>, <code>CMakeLists.txt</code>. <code>pip install -e ".[dev]"</code> then <code>pytest</code>. Document build graph for future you.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Fresh venv instructions in README</li><li>≥10 pytest cases</li><li>Editable install works on your OS</li></ul>
+<div class="q-success"><strong>Done when:</strong> Another machine (or WSL) can build from README alone.</div></div>
+
+<div class="q-block"><span class="q-num">BQ11</span> <span class="difficulty diff-brutal">BRUTAL</span>
+<div class="q-title">Matrix multiply: NumPy baseline vs C++ row-major kernel — cache explanation</div>
+<span class="q-label">What you must do:</span>
+<p>Implement naive O(n³) in Python, NumPy, C++ bound extension. Discuss row vs column major, cache lines, GIL release. Sizes 64, 256, 512. Written: why NumPy beats naive C++ if C++ is wrong layout.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Results match within float tolerance</li><li>≥3 sizes timed</li><li>README cache section with diagram</li></ul>
+<div class="q-success"><strong>Done when:</strong> Optimized C++ beats Python loop at n≥256; you explain i-j-k order.</div></div>
+
+<div class="q-block"><span class="q-num">BQ12</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">Python CLI (argparse) driving C++ simulation with progress callback</div>
+<span class="q-label">What you must do:</span>
+<p>C++ runs N steps of simulation; every k steps calls Python callback with percent. Python prints progress bar. Clean shutdown on SIGINT. Map callback to <code>std::function</code> + pybind11.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>argparse CLI</li><li>≥12 integration tests</li><li>GIL policy doc</li></ul>
+<div class="q-success"><strong>Done when:</strong> Ctrl+C doesn't deadlock; progress monotonic.</div></div>
+
+<div class="q-block"><span class="q-num">BQ13</span> <span class="difficulty diff-brutal">BRUTAL</span>
+<div class="q-title">Expose C++ class Widget: Pythonic API (__repr__, __len__, iteration)</div>
+<span class="q-label">What you must do:</span>
+<p>C++ <code>Widget</code> with methods; pybind11 maps + <code>__repr__</code> lambda. Python code uses it like native class. Compare to pure Python Widget — same tests, dual implementation.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Shared pytest suite parametrized py|native</li><li>Rule of Five correct in C++</li><li>typing stubs optional</li></ul>
+<div class="q-success"><strong>Done when:</strong> pytest passes both backends without code fork in tests.</div></div>
+
+<div class="q-block"><span class="q-num">BQ14</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">JSON token scanner: Python orchestrates, C++ scans bytes — no json library</div>
+<span class="q-label">What you must do:</span>
+<p>Python reads file bytes; passes <code>py::bytes</code> or buffer to C++ tokenizer returning token list. Python builds structure. Discuss copy vs view at boundary.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Handles strings, numbers, braces (subset grammar)</li><li>≥15 token tests</li><li>Error line/col from C++</li></ul>
+<div class="q-success"><strong>Done when:</strong> Invalid JSON raises Python exception with position.</div></div>
+
+<div class="q-block"><span class="q-num">BQ15</span> <span class="difficulty diff-brutal">BRUTAL</span>
+<div class="q-title">Thread pool bridge: Python submits jobs; C++ pool with GIL release</div>
+<span class="q-label">What you must do:</span>
+<p>Reuse C++ concurrency capstone pool. Python <code>pool.submit(fn, args)</code> returns future-like object. TSan clean. Document deadlock if callback tries to take GIL incorrectly.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>≥20 concurrent jobs test</li><li>Graceful shutdown</li><li>Link C++ topic 15 + Py 16</li></ul>
+<div class="q-success"><strong>Done when:</strong> 1000 jobs complete; no TSan reports.</div></div>
+
+<div class="q-block"><span class="q-num">BQ16</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">Profile Mini DB Engine: identify hot path → extract one function to C++</div>
+<span class="q-label">What you must do:</span>
+<p>cProfile on realistic workload. One function (hash lookup, serialize row, parse query) to C++. Before/after benchmark. Keep pure Python fallback flag.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>cProfile screenshot or stats table</li><li>≥20% wall time saved on target workload OR written proof bound elsewhere</li><li>Mini DB tests still pass</li></ul>
+<div class="q-success"><strong>Done when:</strong> Optimization justified with numbers, not intuition.</div></div>
+
+<div class="q-block"><span class="q-num">BQ17</span> <span class="difficulty diff-brutal">BRUTAL</span>
+<div class="q-title">ASan across boundary: intentional leak — find and fix with gdb + pytest</div>
+<span class="q-label">What you must do:</span>
+<p>Seed bug: C++ returns pointer to stack or leaks malloc. Python calls repeatedly. Fix with correct ownership (<code>unique_ptr</code> holder). Document debug session steps.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>ASan build flags documented</li><li>Before/after stack trace</li><li>Fix merged with regression test</li></ul>
+<div class="q-success"><strong>Done when:</strong> ASan clean under pytest load test.</div></div>
+
+<div class="q-block"><span class="q-num">BQ18</span> <span class="difficulty diff-hard">HARD</span>
+<div class="q-title">Typing bridge: py.typed + stubs for extension module</div>
+<span class="q-label">What you must do:</span>
+<p>Python topic 14 applied to extension: <code>.pyi</code> stubs, mypy clean on consumer code. Document what pybind11 can/can't express statically.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>mypy passes on example client</li><li>README typing section</li><li>≥5 typed call sites</li></ul>
+<div class="q-success"><strong>Done when:</strong> mypy --strict passes on demo client (with documented ignores if any).</div></div>
+
+<div class="q-block"><span class="q-num">BQ19</span> <span class="difficulty diff-brutal">BRUTAL</span>
+<div class="q-title">Async Python + sync C++: run extension in executor — when not to block event loop</div>
+<span class="q-label">What you must do:</span>
+<p>FastAPI or asyncio app calls C++ work via <code>run_in_executor</code>. Compare blocking call (bad) vs executor (good) under concurrent requests. Relate to Python topic 15.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>2 endpoints benchmark</li><li>≥10 asyncio tests</li><li>Written guidance for FastAPI + C++</li></ul>
+<div class="q-success"><strong>Done when:</strong> Concurrent requests don't stall event loop with executor pattern.</div></div>
+
+<div class="q-block"><span class="q-num">BQ20</span> <span class="difficulty diff-brutal">BRUTAL</span>
+<div class="q-title">Capstone wrap: ship prior best C++ library as pip-installable Python package</div>
+<span class="q-label">What you must do:</span>
+<p>Pick graph, cache, parser, or sim from C++ capstones. Full bindings, pytest, README architecture diagram, semver, changelog. Python tutorial notebook or script using only public API.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>≥30 pytest</li><li>Native C++ tests still pass</li><li>CI sketch (GitHub Actions)</li><li>Migration guide C++ vs Python API</li></ul>
+<div class="q-success"><strong>Done when:</strong> New user completes tutorial in &lt;30 min from clean venv.</div></div>
+
+<h2 id="bridge-mega">Combination MEGA Capstones (BQ21–BQ30)</h2>
+<p>Multi-week projects. Each requires Python orchestration + C++ core + tests + benchmark + written architecture.</p>
+
+<div class="q-block"><span class="q-num">BQ21</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">Mini DB Engine Native Acceleration Layer</div>
+<span class="q-label">Your goal:</span><p>Phase 0 project + both tracks integrated.</p>
+<span class="q-label">What you must do:</span>
+<p>Complete Python Mini DB (hash + BST + heap + WAL stub). Profile and extract ≥2 hot paths to C++ (index lookup, row serialization). Python query engine unchanged API. Full pytest suite. Document architecture: which layer owns files, memory, indexes.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>≥1000 inserts benchmark before/after</li><li>Pure Python fallback env flag</li><li>ASan + pytest CI</li><li>Architecture diagram layers Python/C++</li></ul>
+<div class="q-success"><strong>Done when:</strong> Mini DB v2 shipped; README explains every boundary crossing.</div></div>
+
+<div class="q-block"><span class="q-num">BQ22</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">Image pipeline: Python reads PNG → C++ convolve → Python displays</div>
+<span class="q-label">What you must do:</span>
+<p>Python PIL/png reader; pass buffer to C++ 3×3 filter (zero-copy); return to Python for save/display. Multiple filters. Benchmark vs pure Python convolution. Discuss GIL, row stride, RGB layout.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>≥3 filters</li><li>Correctness vs naive Python</li><li>720p image realtime target documented</li></ul>
+<div class="q-success"><strong>Done when:</strong> Visible speedup; wrong dimensions caught at boundary.</div></div>
+
+<div class="q-block"><span class="q-num">BQ23</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">Performance lab: 5 kernels × 3 implementations (Python, NumPy, C++)</div>
+<span class="q-label">What you must do:</span>
+<p>dot, matvec, reduce, sort slice, string concat. Fair warmup, 3 sizes each, plot crossover. Essay: when bridging hurts (small N, setup cost, maintenance).</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Reproducible benchmark script</li><li>CSV results committed</li><li>≥800 word conclusions</li></ul>
+<div class="q-success"><strong>Done when:</strong> Decision flowchart: "should I bridge this?"</div></div>
+
+<div class="q-block"><span class="q-num">BQ24</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">Custom type casters library (Point3, Result, Grid) — Pythonic in containers</div>
+<span class="q-label">What you must do:</span>
+<p>≥4 types roundtrip in <code>list</code>, <code>dict</code>, function args. Readable errors on mismatch. Reusable header for future projects.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>≥18 pytest cases</li><li>Document caster pattern</li><li>Header-only option</li></ul>
+<div class="q-success"><strong>Done when:</strong> Next project imports casters without copy-paste.</div></div>
+
+<div class="q-block"><span class="q-num">BQ25</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">Embedded Python plugin host (C++ app loads user .py plugins)</div>
+<span class="q-label">What you must do:</span>
+<p>C++ host; pybind11 embed; discover plugins/; call hooks; handle import errors safely. No GIL deadlock under reload.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>≥10 sample plugins</li><li>Sandbox bad plugin test</li><li>Architecture doc</li></ul>
+<div class="q-success"><strong>Done when:</strong> Add plugin without recompiling host.</div></div>
+
+<div class="q-block"><span class="q-num">BQ26</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">Cross-language memory arena: NumPy views backed by C++ shared_ptr</div>
+<span class="q-label">What you must do:</span>
+<p>C++ allocates arena; Python gets NumPy views with base keeping owner alive. Subviews, resize forbidden cases, use-after-free tests with ASan.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>keep_alive tests</li><li>Ownership diagram</li><li>Negative tests fail safely</li></ul>
+<div class="q-success"><strong>Done when:</strong> Owner release invalidates views — tested.</div></div>
+
+<div class="q-block"><span class="q-num">BQ27</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">Realtime log analyzer: Python tail -f + C++ parser + asyncio dashboard</div>
+<span class="q-label">What you must do:</span>
+<p>Python watches file; pushes chunks to C++ line parser; asyncio WebSocket dashboard counts error levels. Combines Py 15/16, C++ 16 I/O, bridge callbacks.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>1M line soak test</li><li>Graceful rotate</li><li>Latency metrics logged</li></ul>
+<div class="q-success"><strong>Done when:</strong> Dashboard updates &lt;1s behind tail on 10k lines/s burst.</div></div>
+
+<div class="q-block"><span class="q-num">BQ28</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">ctypes/cffi/pybind11 trinity benchmark + team decision doc</div>
+<span class="q-label">What you must do:</span>
+<p>Same C API, three bindings, measured build time + runtime + developer ergonomics. Recommend policy for your future Phase 1 file storage project.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>All three work</li><li>Comparison table</li><li>Phase 1 recommendation</li></ul>
+<div class="q-success"><strong>Done when:</strong> Doc cited in Phase 1 README.</div></div>
+
+<div class="q-block"><span class="q-num">BQ29</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">Production bridge template: logging, semver, GIL policy, CI wheels stub</div>
+<span class="q-label">What you must do:</span>
+<p>Template repo future projects copy. scikit-build-core, pytest, ASan job, changelog, CONTRIBUTING, pybind11 module skeleton, Python client package.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Cookiecutter or template dir</li><li>CI yaml</li><li>5-minute quickstart verified</li></ul>
+<div class="q-success"><strong>Done when:</strong> New module bootstrapped from template in &lt;1 hour.</div></div>
+
+<div class="q-block"><span class="q-num">BQ30</span> <span class="difficulty diff-mega">MEGA</span>
+<div class="q-title">Phase 0 finale: Demo day — present Python + C++ + Bridge stack to one audience</div>
+<span class="q-label">What you must do:</span>
+<p>15-minute walkthrough: Mini DB (Python), dynamic array (C++), one bridge extension, benchmark slide, live pytest + ctest. Write retrospective: what felt different between languages, what you'd bridge again.</p>
+<span class="q-label">Requirements:</span><ul class="q-req"><li>Slides or markdown deck</li><li>Live demo script</li><li>Retrospective ≥1000 words</li><li>Git tag v1.0-phase0</li></ul>
+<div class="q-success"><strong>Done when:</strong> You can answer arbitrary "why this layer?" questions without notes — Phase 0 complete.</div></div>
+
+<div class="warn-box"><strong>After Bridge:</strong> You enter Phase 1 (networking, OS, databases, distributed file storage). Keep <code>bridge/</code> patterns — Python orchestrates, C++ accelerates proven bottlenecks only.</div>
+
 </section>
 </main>
 <script>
